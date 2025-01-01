@@ -1,0 +1,36 @@
+trigger:
+- main
+
+pool:
+  vmImage: 'ubuntu-latest'
+
+variables:
+  sonar.projectKey: 'Marketplace_Marketplace_aa794b2a-16ef-417b-8fb7-5b5e4f1d9785'
+  sonar.projectName: 'Marketplace'
+
+steps:
+- task: NodeTool@0
+  inputs:
+    versionSpec: '16.x'
+  displayName: 'Install Node.js'
+
+- script: |
+    npm install
+  displayName: 'Install Dependencies'
+
+- task: SonarQubePrepare@5
+  inputs:
+    SonarQube: 'MarketPlace FE'
+    scannerMode: 'CLI'
+    configMode: 'manual'
+    cliProjectKey: $(sonar.projectKey)
+    cliProjectName: $(sonar.projectName)
+    cliSources: './src'
+
+- script: |
+    npx sonarqube-scanner
+  displayName: 'Run SonarQube Analysis'
+
+- task: SonarQubePublish@5
+  inputs:
+    pollingTimeoutSec: '300'
